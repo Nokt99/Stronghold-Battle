@@ -1,0 +1,65 @@
+definition {
+    id: "leaves"
+    displayName: "Leaves"
+    category: "natural"
+
+    baseLength: 0.95
+
+    properties {
+        solid: false
+        breakable: true
+        buildable: false
+        rotatable: false
+        transparent: true
+    }
+
+    hitbox {
+        width: 0.95
+        height: 0.95
+        depth: 0.95
+        collision: "soft"
+        stepable: false
+    }
+
+    breakTimes {
+        hands: 0.5
+        axe: 0.5
+        any: 0.5
+    }
+
+    dropTable {
+        leaves_cluster {
+            chance: 0.10
+            model: "leaves_cluster"
+            texture: "leaves_texture"
+            shape: "soft_cube"
+        }
+
+        nothing {
+            chance: 0.90
+            model: "none"
+            texture: "none"
+            shape: "none"
+        }
+    }
+
+    dropBehavior {
+        floatHeight: 0.10
+        spinSpeed: "slow"
+        despawnTime: 180
+    }
+
+    placementRules {
+        canPlaceOn: "none"
+        stackable: false
+    }
+
+    interaction {
+        reachRequired {
+            hands: 0.89
+            weapon: 1.35
+        }
+
+        breakCondition: "reach_intersects_hitbox"
+    }
+}
