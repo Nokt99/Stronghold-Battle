@@ -1,0 +1,59 @@
+entity {
+    id: "tree"
+    displayName: "Tree"
+    category: "natural_structure"
+
+    sizeCategory: 2.5
+
+    hitbox {
+        width: 1.0
+        height: 2.5
+        depth: 1.0
+        collision: "solid"
+        stepable: false
+    }
+
+    spawnRules {
+        chancePerBlock: 0.10
+        allowedBiomes: ["forest", "plains"]
+        requiresGroundBlock: ["grass", "dirt"]
+        minDistanceBetweenTrees: 3
+    }
+
+    components {
+        trunk: "wood"
+        leaves: "leaves"
+    }
+
+    generation {
+        trunkHeight {
+            min: 2
+            max: 3
+        }
+
+        trunkShape {
+            perfect_cylinder_chance: 0.50
+            twisted_cylinder_chance: 0.25
+            no_drop_chance: 0.25
+        }
+
+        leafCluster {
+            minLayers: 2
+            maxLayers: 4
+
+            density {
+                min: 0.4
+                max: 0.9
+            }
+
+            radius {
+                min: 1
+                max: 2
+            }
+        }
+    }
+
+    dropBehavior {
+        useBlockDropTables: true
+    }
+}
