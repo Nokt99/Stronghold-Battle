@@ -1,0 +1,71 @@
+definition {
+    id: "wood"
+    displayName: "Wood"
+    category: "natural"
+
+    baseLength: 1.0
+
+    properties {
+        solid: true
+        breakable: true
+        buildable: true
+        rotatable: true
+    }
+
+    hitbox {
+        width: 1.0
+        height: 1.0
+        depth: 1.0
+        collision: "solid"
+        stepable: false
+    }
+
+    breakTimes {
+        hands: 2.0
+        axe: 1.0
+    }
+
+    dropTable {
+        perfect_cylinder {
+            chance: 0.50
+            model: "wood_perfect_cylinder"
+            texture: "wood_clean"
+            shape: "cylinder"
+        }
+
+        twisted_cylinder {
+            chance: 0.25
+            model: "wood_twisted_cylinder"
+            texture: "wood_clean"
+            shape: "twisted_cylinder"
+        }
+
+        nothing {
+            chance: 0.25
+            model: "none"
+            texture: "none"
+            shape: "none"
+        }
+    }
+
+    dropBehavior {
+        floatHeight: 0.15
+        spinSpeed: "slow"
+        despawnTime: 300
+    }
+
+    placementRules {
+        canPlaceOn: "solid"
+        rotation: "player_facing"
+        stackable: true
+    }
+
+    interaction {
+        reachRequired {
+            hands: 0.89
+            weapon: 1.35
+        }
+
+        breakCondition: "reach_intersects_hitbox"
+    }
+}
