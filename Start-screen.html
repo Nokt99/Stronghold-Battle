@@ -3,7 +3,6 @@
 <head>
     <title>STRONGHOLD BATTLE</title>
 
-    <!-- Medieval Font -->
     <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap" rel="stylesheet">
 
     <style>
@@ -13,7 +12,6 @@
             font-family: "Comic Sans MS", cursive, sans-serif;
         }
 
-        /* Background canvas */
         #bg {
             position: fixed;
             top: 0;
@@ -21,14 +19,6 @@
             width: 100vw;
             height: 100vh;
             z-index: 0;
-        }
-
-        /* MENU SCREEN */
-        #menuScreen {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            z-index: 10;
         }
 
         .title {
@@ -78,13 +68,22 @@
             display: none;
         }
 
-        /* CREATE ACCOUNT SCREEN */
-        #createAccountScreen {
-            display: none;
+        #menuScreen,
+        #createAccountScreen,
+        #serverScreen,
+        #serverSelectScreen,
+        #manageServersPanel {
             position: absolute;
             width: 100%;
             height: 100%;
-            z-index: 15;
+            z-index: 10;
+        }
+
+        #createAccountScreen,
+        #serverScreen,
+        #serverSelectScreen,
+        #manageServersPanel {
+            display: none;
         }
 
         .container {
@@ -141,12 +140,81 @@
             font-size: 18px;
             color: yellow;
         }
+
+        .medieval-title {
+            font-family: "MedievalSharp", serif;
+            font-size: 40px;
+            color: #f5f5f5;
+        }
+
+        .server-container {
+            position: absolute;
+            top: 15%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 70%;
+            background: rgba(0,0,0,0.5);
+            border-radius: 15px;
+            padding: 20px;
+            color: white;
+        }
+
+        .server-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 40px;
+        }
+
+        .server-column {
+            flex: 1;
+        }
+
+        .server-action {
+            margin-top: 10px;
+            padding: 10px 20px;
+            font-size: 20px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            background: #8b0000;
+            color: white;
+        }
+
+        .server-message {
+            margin-top: 10px;
+            font-size: 16px;
+            color: #ffd700;
+        }
+
+        .server-container input {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 8px;
+            border: none;
+            font-size: 18px;
+        }
+
+        .manage-servers-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            padding: 8px 16px;
+            font-size: 18px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            background: rgba(0,0,0,0.7);
+            color: #f5f5f5;
+            font-family: "MedievalSharp", serif;
+            z-index: 12;
+            display: none;
+        }
     </style>
 </head>
 
 <body>
 
-    <!-- Three.js background -->
     <canvas id="bg"></canvas>
 
     <!-- MENU SCREEN -->
@@ -154,6 +222,7 @@
         <div class="title">STRONGHOLD BATTLE</div>
         <button class="play-button" id="playBtn">PLAY</button>
         <div id="axesContainer"></div>
+        <button id="manageServersBtn" class="manage-servers-btn">MANAGE SERVERS</button>
     </div>
 
     <!-- CREATE ACCOUNT SCREEN -->
@@ -189,20 +258,61 @@
                 <button style="background:#000; color:white;">Apple</button>
                 <button style="background:#0078D4; color:white;">Microsoft</button>
             </div>
+
+            <button id="finishAccountBtn" class="server-action" style="margin-top:20px;">CONTINUE</button>
         </div>
     </div>
 
-    <!-- Sounds -->
+    <!-- SERVER CREATE / JOIN SCREEN -->
+    <div id="serverScreen">
+        <div class="server-container">
+            <div class="server-row">
+                <div class="server-column">
+                    <div class="medieval-title">CREATE A SERVER</div>
+                    <button id="createServerBtn" class="server-action">Create a server</button>
+
+                    <div id="createServerForm" style="display:none; margin-top:15px;">
+                        <input id="serverNameInput" placeholder="Server name (e.g. GOATED SERVER)">
+                        <input id="serverAddressInput" placeholder="server.gg/your-server-name">
+                        <button id="confirmCreateServer" class="server-action">CREATE SERVER</button>
+                        <div id="createServerMessage" class="server-message"></div>
+                    </div>
+                </div>
+
+                <div class="server-column">
+                    <div class="medieval-title">JOIN A SERVER</div>
+                    <input id="joinServerAddressInput" placeholder="Enter server address (server.gg/...)">
+                    <button id="joinServerBtn" class="server-action">JOIN SERVER</button>
+                    <div id="joinServerMessage" class="server-message"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SERVER SELECT SCREEN (WHEN HITTING PLAY) -->
+    <div id="serverSelectScreen">
+        <div class="server-container">
+            <div class="medieval-title">SELECT A SERVER</div>
+            <div id="serverSelectList" style="margin-top:15px;"></div>
+        </div>
+    </div>
+
+    <!-- MANAGE SERVERS PANEL -->
+    <div id="manageServersPanel">
+        <div class="server-container">
+            <div class="medieval-title">MANAGE SERVERS</div>
+            <div id="serverList" style="margin-top:15px;"></div>
+            <button id="closeManageServers" class="server-action" style="margin-top:20px;">CLOSE</button>
+        </div>
+    </div>
+
     <audio id="clickSound" src="medieval_click.mp3"></audio>
     <audio id="clashSound" src="sword_clash.mp3"></audio>
 
-    <!-- Three.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
     <script>
-        // -------------------------------
         // THREE.JS BACKGROUND
-        // -------------------------------
         const canvas = document.getElementById("bg");
         const renderer = new THREE.WebGLRenderer({ canvas: canvas });
         renderer.setSize(window.innerWidth, window.innerHeight);
@@ -215,7 +325,6 @@
         light.position.set(5, 10, 5);
         scene.add(light);
 
-        // Particles
         const particleGeometry = new THREE.BufferGeometry();
         const particleCount = 500;
         const positions = [];
@@ -240,48 +349,44 @@
         }
         animate();
 
-        // -------------------------------
-        // UI LOGIC
-        // -------------------------------
+        // UI ELEMENTS
+        const menuScreen = document.getElementById("menuScreen");
+        const createAccountScreen = document.getElementById("createAccountScreen");
+        const serverScreen = document.getElementById("serverScreen");
+        const serverSelectScreen = document.getElementById("serverSelectScreen");
+        const manageServersPanel = document.getElementById("manageServersPanel");
+
         const playBtn = document.getElementById("playBtn");
         const axesContainer = document.getElementById("axesContainer");
         const clickSound = document.getElementById("clickSound");
         const clashSound = document.getElementById("clashSound");
+        const manageServersBtn = document.getElementById("manageServersBtn");
 
-        playBtn.addEventListener("click", () => {
-            clickSound.play();
-
-            // Shrink then rebound
-            playBtn.style.transform = "translate(-50%, -20%) scale(0.85)";
-            setTimeout(() => {
-                playBtn.style.transform = "translate(-50%, -20%) scale(1.2)";
-            }, 150);
-
-            // Axes animation
-            setTimeout(() => {
-                axesContainer.style.display = "block";
-                clashSound.play();
-
-                axesContainer.innerHTML = `
-                    <svg width="300" height="300">
-                        <line x1="50" y1="250" x2="250" y2="50" stroke="silver" stroke-width="20"/>
-                        <line x1="250" y1="250" x2="50" y2="50" stroke="silver" stroke-width="20"/>
-                    </svg>
-                `;
-            }, 250);
-
-            // Switch to Create Account screen
-            setTimeout(() => {
-                document.getElementById("menuScreen").style.display = "none";
-                document.getElementById("createAccountScreen").style.display = "block";
-            }, 1200);
-        });
-
-        // Age logic
+        const finishAccountBtn = document.getElementById("finishAccountBtn");
         const ageInput = document.getElementById("age");
         const parentButton = document.getElementById("parentButton");
         const parentMessage = document.getElementById("parentMessage");
 
+        const createServerBtn = document.getElementById("createServerBtn");
+        const createServerForm = document.getElementById("createServerForm");
+        const serverNameInput = document.getElementById("serverNameInput");
+        const serverAddressInput = document.getElementById("serverAddressInput");
+        const confirmCreateServer = document.getElementById("confirmCreateServer");
+        const createServerMessage = document.getElementById("createServerMessage");
+
+        const joinServerAddressInput = document.getElementById("joinServerAddressInput");
+        const joinServerBtn = document.getElementById("joinServerBtn");
+        const joinServerMessage = document.getElementById("joinServerMessage");
+
+        const serverSelectList = document.getElementById("serverSelectList");
+        const serverList = document.getElementById("serverList");
+        const closeManageServers = document.getElementById("closeManageServers");
+
+        // In-memory server data
+        let ownedServers = [];
+        let knownServers = [];
+
+        // AGE LOGIC
         ageInput.addEventListener("input", () => {
             if (ageInput.value < 12) {
                 parentButton.style.display = "block";
@@ -294,6 +399,173 @@
         parentButton.addEventListener("click", () => {
             parentMessage.style.display = "block";
         });
+
+        // AFTER ACCOUNT CREATION → SERVER SCREEN
+        finishAccountBtn.addEventListener("click", () => {
+            createAccountScreen.style.display = "none";
+            serverScreen.style.display = "block";
+            manageServersBtn.style.display = "block";
+        });
+
+        // PLAY BUTTON → SERVER SELECT SCREEN
+        playBtn.addEventListener("click", () => {
+            clickSound.play();
+
+            playBtn.style.transform = "translate(-50%, -20%) scale(0.85)";
+            setTimeout(() => {
+                playBtn.style.transform = "translate(-50%, -20%) scale(1.2)";
+            }, 150);
+
+            setTimeout(() => {
+                axesContainer.style.display = "block";
+                clashSound.play();
+                axesContainer.innerHTML = `
+                    <svg width="300" height="300">
+                        <line x1="50" y1="250" x2="250" y2="50" stroke="silver" stroke-width="20"/>
+                        <line x1="250" y1="250" x2="50" y2="50" stroke="silver" stroke-width="20"/>
+                    </svg>
+                `;
+            }, 250);
+
+            setTimeout(() => {
+                showServerSelect();
+            }, 1200);
+        });
+
+        // CREATE SERVER FLOW
+        createServerBtn.addEventListener("click", () => {
+            createServerForm.style.display =
+                createServerForm.style.display === "none" ? "block" : "none";
+        });
+
+        confirmCreateServer.addEventListener("click", () => {
+            const name = serverNameInput.value.trim();
+            const addr = serverAddressInput.value.trim();
+
+            if (!name || !addr) {
+                createServerMessage.textContent = "Fill in both fields.";
+                return;
+            }
+
+            if (!addr.startsWith("server.gg/")) {
+                createServerMessage.textContent = "Address must start with server.gg/";
+                return;
+            }
+
+            const server = {
+                name,
+                address: addr,
+                players: 0,
+                online: true
+            };
+
+            ownedServers.push(server);
+            knownServers.push(server);
+
+            createServerMessage.textContent = "SERVER CREATED";
+        });
+
+        // JOIN SERVER FLOW
+        joinServerBtn.addEventListener("click", () => {
+            const addr = joinServerAddressInput.value.trim();
+            if (!addr) {
+                joinServerMessage.textContent = "Enter a server address.";
+                return;
+            }
+
+            joinServerMessage.textContent = "Joined server: " + addr;
+
+            const existing = knownServers.find(s => s.address === addr);
+            if (!existing) {
+                knownServers.push({
+                    name: addr.split("/").pop() || "Unknown Server",
+                    address: addr,
+                    players: 0,
+                    online: true
+                });
+            }
+        });
+
+        // SERVER SELECT SCREEN
+        function showServerSelect() {
+            serverSelectList.innerHTML = "";
+
+            if (knownServers.length === 0) {
+                serverSelectList.textContent = "No servers available. Create or join one first.";
+            } else {
+                knownServers.forEach((srv, idx) => {
+                    const div = document.createElement("div");
+                    div.style.marginTop = "15px";
+                    div.innerHTML = `
+                        <div><strong>${srv.name}</strong></div>
+                        <div>Address: ${srv.address}</div>
+                        <div>Players: ${srv.players}</div>
+                        <div>Status: ${srv.online ? "Online" : "Offline"}</div>
+                        <button data-idx="${idx}" class="server-action join-this-server">
+                            JOIN SERVER
+                        </button>
+                    `;
+                    serverSelectList.appendChild(div);
+                });
+
+                document.querySelectorAll(".join-this-server").forEach(btn => {
+                    btn.onclick = () => {
+                        const i = parseInt(btn.getAttribute("data-idx"), 10);
+                        const chosen = knownServers[i];
+                        if (!chosen.online) return;
+                        console.log("Connecting to server:", chosen);
+                        // here you’d transition into the actual game
+                    };
+                });
+            }
+
+            serverSelectScreen.style.display = "block";
+        }
+
+        // MANAGE SERVERS PANEL
+        manageServersBtn.addEventListener("click", () => {
+            renderManageServers();
+            manageServersPanel.style.display = "block";
+        });
+
+        closeManageServers.addEventListener("click", () => {
+            manageServersPanel.style.display = "none";
+        });
+
+        function renderManageServers() {
+            serverList.innerHTML = "";
+            if (ownedServers.length === 0) {
+                serverList.textContent = "You have no servers yet.";
+                return;
+            }
+
+            ownedServers.forEach((srv, idx) => {
+                const div = document.createElement("div");
+                div.style.marginTop = "15px";
+                div.innerHTML = `
+                    <div><strong>Name:</strong> ${srv.name}</div>
+                    <div><strong>Address:</strong> ${srv.address}</div>
+                    <div><strong>Players:</strong> ${srv.players}</div>
+                    <div><strong>Status:</strong> ${srv.online ? "Online" : "Offline"}</div>
+                    <button data-idx="${idx}" class="server-action toggle-server">
+                        ${srv.online ? "SHUT DOWN SERVER" : "TURN ON SERVER"}
+                    </button>
+                    <div style="font-size:14px; opacity:0.7; margin-top:5px;">
+                        Analytics, chat logs, potential dangers, useless stats (placeholder)
+                    </div>
+                `;
+                serverList.appendChild(div);
+            });
+
+            document.querySelectorAll(".toggle-server").forEach(btn => {
+                btn.onclick = () => {
+                    const i = parseInt(btn.getAttribute("data-idx"), 10);
+                    ownedServers[i].online = !ownedServers[i].online;
+                    renderManageServers();
+                };
+            });
+        }
+        
     </script>
 
 </body>
