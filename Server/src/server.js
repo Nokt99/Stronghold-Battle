@@ -3,9 +3,12 @@ const cors = require("cors");
 const helmet = require("helmet");
 const morgan = require("morgan");
 const { connectDB } = require("./config/db");
+
 const authRoutes = require("./routes/auth");
 const userRoutes = require("./routes/users");
 const gameRoutes = require("./routes/game");
+const serverRoutes = require("./routes/servers");
+
 const errorHandler = require("./middleware/errorHandler");
 
 const app = express();
@@ -20,6 +23,7 @@ connectDB();
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/game", gameRoutes);
+app.use("/api/servers", serverRoutes);
 
 app.use(errorHandler);
 
